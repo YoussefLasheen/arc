@@ -51,11 +51,7 @@ class ArcAnimationDemo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: const DraggableCard(
-        child: FlutterLogo(
-          size: 128,
-        ),
-      ),
+      body: const DraggableCard(),
     );
   }
 }
@@ -63,9 +59,7 @@ class ArcAnimationDemo extends StatelessWidget {
 /// A draggable card that moves back to [Alignment.center] when it's
 /// released.
 class DraggableCard extends StatefulWidget {
-  const DraggableCard({required this.child, super.key});
-
-  final Widget child;
+  const DraggableCard({super.key});
 
   @override
   State<DraggableCard> createState() => _DraggableCardState();
@@ -207,8 +201,10 @@ class _DraggableCardState extends State<DraggableCard>
             },
             child: Transform.rotate(
               angle: _spinningAngle,
-              child: Card(
-                child: widget.child,
+              child: Image.asset(
+                'assets/logo.png',
+                height: 150,
+                width: 150,
               ),
             ),
           ),
