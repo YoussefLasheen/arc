@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
@@ -100,6 +101,8 @@ class _DraggableCardState extends State<DraggableCard>
   Alignment _dragAlignment = Alignment.center;
   double _spinningAngle = 0;
   bool direction = false;
+
+  bool isTouchingLogo = false;
 
   late Animation<Alignment> _draggingAnimation;
   late Animation<double> _spinningAnimation;
@@ -214,6 +217,9 @@ class _DraggableCardState extends State<DraggableCard>
           alignment: _dragAlignment,
           child: GestureDetector(
             onPanDown: (details) {
+              setState(() {
+                isTouchingLogo = true;
+              });
               _draggingController.stop();
             },
             onPanUpdate: (details) {
@@ -225,21 +231,84 @@ class _DraggableCardState extends State<DraggableCard>
               });
             },
             onPanEnd: (details) {
+              setState(() {
+                isTouchingLogo = false;
+              });
               final _unitVelocity =
                   unitVelocity(details.velocity.pixelsPerSecond, size);
               _runDraggingAnimation(_unitVelocity);
             },
             child: Transform.rotate(
               angle: _spinningAngle,
-              child: SizedBox.square(
-                dimension: logoSize,
+              child: TweenAnimationBuilder<double>(
+                duration: const Duration(milliseconds: 150),
+                curve: Curves.easeInOut,
+                tween: Tween<double>(end: isTouchingLogo ? 1 : 0),
                 child: Image.asset(
                   'assets/logo.png',
+                  height: logoSize,
+                  width: logoSize,
                 ),
+                builder: (context, value, child) {
+                  return Transform.scale(
+                    scale: lerpDouble(1, 1.15, value)!,
+                    child: WidgetShadow(
+                      color: Color.lerp(Colors.black, Colors.black26, value)!,
+                      sigma: lerpDouble(0, 30, value),
+                      offset: const Offset(2, 2),
+                      child: child!,
+                    ),
+                  );
+                },
               ),
             ),
           ),
         ),
+      ],
+    );
+  }
+}
+
+class WidgetShadow extends StatelessWidget {
+  final Widget child;
+  final double? sigma;
+  final Offset? offset;
+  final Color color;
+
+  const WidgetShadow({
+    super.key,
+    required this.child,
+    this.sigma,
+    this.offset,
+    this.color = Colors.black,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Widget child = ColorFiltered(
+      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+      child: this.child,
+    );
+    if (offset != null) {
+      child = Transform.translate(
+        offset: offset!,
+        child: child,
+      );
+    }
+    if (sigma != null && sigma! > 0) {
+      child = ImageFiltered(
+        imageFilter: ImageFilter.blur(
+          sigmaY: sigma!,
+          sigmaX: sigma!,
+          tileMode: TileMode.decal,
+        ),
+        child: child,
+      );
+    }
+    return Stack(
+      children: <Widget>[
+        child,
+        this.child,
       ],
     );
   }
