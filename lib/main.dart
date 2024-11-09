@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const MaterialApp(home: ArcAnimationDemo()));
@@ -12,6 +13,9 @@ const double acceleration = -8.0;
 const double rotationVelocityModifier = 3;
 
 const double logoSize = 175.0;
+
+const int numberOfSlices = 16;
+const double sliceAngle = 2 * pi / numberOfSlices;
 
 double rotationChange(Offset position, Offset delta) {
   /// Pan location on the wheel
@@ -148,6 +152,7 @@ class _DraggableCardState extends State<DraggableCard>
     _spinningController.animateTo(1, duration: Duration(seconds: time));
   }
 
+  int currentSlice = 0;
   @override
   void initState() {
     super.initState();
@@ -177,6 +182,11 @@ class _DraggableCardState extends State<DraggableCard>
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final _currentSlice = _spinningAngle ~/ sliceAngle;
+    if (_currentSlice != currentSlice) {
+      HapticFeedback.selectionClick();
+      currentSlice = _currentSlice;
+    }
     return Stack(
       children: [
         Positioned.fill(
