@@ -7,6 +7,12 @@ void main() {
   runApp(const MaterialApp(home: ArcAnimationDemo()));
 }
 
+const double rotationToAngleModifier = 0.007;
+const double acceleration = -8.0;
+const double rotationVelocityModifier = 3;
+
+const double logoSize = 175.0;
+
 double rotationChange(Offset position, Offset delta) {
   /// Pan location on the wheel
   bool onTop = position.dy.isNegative;
@@ -103,7 +109,9 @@ class _DraggableCardState extends State<DraggableCard>
   }
 
   void _runSpinningAnimation(double unitVelocity) {
-    const double acceleration = -2.0;
+    //Modify the unit velocity to make the animation more realistic
+    unitVelocity = rotationVelocityModifier * unitVelocity;
+
     final int time = unitVelocity < 1 ? 1 : (-unitVelocity ~/ acceleration);
 
     //Calculate the distance
@@ -170,7 +178,7 @@ class _DraggableCardState extends State<DraggableCard>
               double rotationalChange = rotationChange(position, details.delta);
               setState(() {
                 direction = rotationalChange.isNegative;
-                _spinningAngle += rotationalChange * 0.005;
+                _spinningAngle += rotationalChange * rotationToAngleModifier;
               });
             },
             onPanEnd: (details) {
@@ -201,10 +209,11 @@ class _DraggableCardState extends State<DraggableCard>
             },
             child: Transform.rotate(
               angle: _spinningAngle,
-              child: Image.asset(
-                'assets/logo.png',
-                height: 150,
-                width: 150,
+              child: SizedBox.square(
+                dimension: logoSize,
+                child: Image.asset(
+                  'assets/logo.png',
+                ),
               ),
             ),
           ),
