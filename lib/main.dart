@@ -55,9 +55,21 @@ class ArcAnimationDemo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: const DraggableCard(),
+    return const Scaffold(
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomLeft,
+            colors: [
+              Color(0xFF0050AC),
+              Color(0xFF3D8BFF),
+              Color(0xFFA7C6EA),
+            ],
+          ),
+        ),
+        child: DraggableCard(),
+      ),
     );
   }
 }
